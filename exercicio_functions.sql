@@ -53,17 +53,43 @@ BEGIN
 END
 
 
-SELECT * FROM fn_funcdenp()
+SELECT Nome_Funcionario, Nome_Dependente, Salario_Funcionario, Salario_Dependente FROM fn_funcdenp()
 
+
+--retorno da soma de um salario com codigo como parametro
 CREATE FUNCTION fn_somasalarios(@cod INT)
 RETURNS DECIMAL(7, 2)
 AS
 BEGIN
-DECLARE @valor_total DECIMAL(7, 2) 
+DECLARE @valor_total DECIMAL(7, 2)    
  SELECT @valor_total = f.Salario + d.Salario_Dependente 
  FROM Funcionario f, Dependente d
- WHERE f.Codigo = @cod
+ WHERE f.Codigo = d.Codigo_Funcionario
+   AND f.Codigo = @cod
  RETURN @valor_total
 END
 
-SELECT dbo.fn_somasalarios(2) AS valor_total
+
+SELECT dbo.fn_somasalarios(4) AS valor_total
+
+
+--Retorno da soma de todos os salarios como uma tabela
+CREATE FUNCTION fn_somarsalario()
+RETURNS @tabela TABLE(
+salario_total          DECIMAL(7,2)
+)
+AS
+BEGIN 
+
+INSERT INTO @tabela (salario_total)
+ SELECT f.Salario + d.Salario_Dependente 
+ FROM Funcionario f, Dependente d
+ WHERE f.Codigo = d.Codigo_Funcionario
+ 
+RETURN 
+END
+
+
+SELECT * FROM fn_somarsalario()
+
+   
